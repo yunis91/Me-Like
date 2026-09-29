@@ -1,0 +1,31 @@
+{
+  "name": "me-like",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "ts-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "mob": "pnpm --filter mobile",
+    "web": "pnpm --filter web",
+    "ext": "pnpm --filter ext",
+    "dev": "pnpm -r --parallel dev",
+    "back:dev": "cd ../me-like-backend && pnpm start:dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@12.4.1",
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "^57.0.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.69.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+	"name": "@app/schemas",
+	"version": "1.0.0",
+	"private": true,
+	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
+	"dependencies": {
+		"@app/api": "workspace:^",
+		"zod": "^4.6.5"
+	}
+}

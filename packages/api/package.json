@@ -1,0 +1,16 @@
+{
+	"name": "@app/api",
+	"version": "1.0.0",
+	"private": true,
+	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
+	"scripts": {
+    "gen": "orval"
+  },
+	"devDependencies": {
+		"orval": "^8.33.0"
+	},
+	"dependencies": {
+		"@tanstack/react-query": "^5.102.8"
+	}
+}
