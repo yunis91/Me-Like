@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Play, Plus } from 'lucide-react-native'
 import { useState } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native'
+import { StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, {
   FadeIn,
   FadeOut,
@@ -16,6 +16,8 @@ import type { DiscoverItemResponse } from '@app/api'
 
 import { Button } from '../ui/Button'
 
+import { router } from 'expo-router'
+import { TitleInfo } from '../hero/TitleInfo'
 import { HomeHeroSlide } from './HomeHeroSlide'
 import { PaginationDot } from './PaginationDot'
 
@@ -86,35 +88,18 @@ export function HomeHeroSlider({ items }: Props) {
           exiting={FadeOut.duration(200)}
           style={{ gap: space[2] }}
         >
-          <Text
-            style={styles.name}
-            numberOfLines={2}
-          >
-            {current?.name}
-          </Text>
-
-          {!!current?.genres?.length ? (
-            <Text style={styles.genres}>
-              {current.genres.slice(0, 3).join(' · ')}
-            </Text>
-          ) : (
-            <Text style={styles.genres}>No genres available</Text>
-          )}
-          
-
-          <Text
-            style={styles.description}
-            numberOfLines={2}
-          >
-            When an overachieving college senior makes a wrong turn...
-          </Text>
+          <TitleInfo 
+            name={current?.name || ''}
+            meta={current?.genres.slice(0, 3).join(' · ')}
+            description="When an overachieving college senior makes a wrong turn..."
+          />
         </Animated.View>
 
         <View style={styles.bottom}>
           <View style={styles.actions}>
             <Button
               icon={Play}
-              onPress={() => {}}
+              onPress={() => router.push(`/title/${current?.key}`)}
             >
               Watch Movie
             </Button>

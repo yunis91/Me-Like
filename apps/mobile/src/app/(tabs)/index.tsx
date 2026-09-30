@@ -5,6 +5,7 @@ import { TitleCard } from '@/components/title-card/TitleCard'
 import { Screen } from '@/components/ui/Screen'
 import { useDiscoverGetTrending } from '@app/api'
 import { space } from '@app/tokens'
+import { router } from 'expo-router'
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue
@@ -42,7 +43,7 @@ export default function Index() {
         >
           {topPicksForYouItems.map(title => (
             <TitleCard
-              onPress={() => {}}
+              onPress={() => router.push(`/title/${title.key}`)}
               title={title}
               key={title.key}
             />
@@ -55,7 +56,7 @@ export default function Index() {
         >
           {trandingItems.map(title => (
             <TitleCard
-              onPress={() => {}}
+              onPress={() => router.push(`/title/${title.key}`)}
               title={title}
               key={title.key}
             />

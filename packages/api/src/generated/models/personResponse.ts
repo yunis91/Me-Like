@@ -5,10 +5,9 @@
  * One library for movies, TV shows, anime, books and games
  * OpenAPI spec version: 1.0
  */
-import type { AuthUserResponse } from './authUserResponse';
 
-export interface MobileAuthResponse {
-  user: AuthUserResponse;
-  accessToken: string;
-  refreshToken: string;
+export interface PersonResponse {
+  name: string;
+  /** @nullable */
+  photoUrl: string | null;
 }
