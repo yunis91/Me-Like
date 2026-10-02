@@ -5,6 +5,7 @@
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
 	"dependencies": {
+		"@app/api": "workspace:^",
 		"@app/types": "workspace:^"
 	}
 }

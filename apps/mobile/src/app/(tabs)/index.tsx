@@ -1,22 +1,25 @@
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeHeroSlider } from '@/components/home/HomeHeroSlider'
 import { SectionCarousel } from '@/components/section-carousel/SectionCarousel'
-import { TitleCard } from '@/components/title-card/TitleCard'
+import { TitleCard } from '@/components/titles/TitleCard'
 import { Screen } from '@/components/ui/Screen'
 import { useDiscoverGetTrending } from '@app/api'
-import { space } from '@app/tokens'
+import { colors, space } from '@app/tokens'
 import { router } from 'expo-router'
+import { ActivityIndicator, Platform, RefreshControl, StyleSheet, View } from 'react-native'
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue
 } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 export default function Index() {
 
-  const {data } = useDiscoverGetTrending({ take: 20 })
+  const { data, refetch, isRefetching } = useDiscoverGetTrending({ take: 20 })
 
   const scrollY = useSharedValue(0)
+  const insets = useSafeAreaInsets()
 
   const scrollHandler = useAnimatedScrollHandler(e => {
     scrollY.set(e.contentOffset.y)
@@ -34,6 +37,15 @@ export default function Index() {
         contentContainerStyle={{ paddingBottom: space[20] }}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={Platform.OS === 'ios' ? 'transparent' : colors.text.primary}
+            colors={[colors.text.primary]}
+            progressBackgroundColor={colors.bg.card}
+          />
+        }
       >
         {!!heroItems.length && <HomeHeroSlider items={heroItems} /> }
 
@@ -65,6 +77,27 @@ export default function Index() {
       </Animated.ScrollView>
 
       <HomeHeader scrollY={scrollY} />
+
+      {Platform.OS === 'ios' && isRefetching && (
+        <View
+          pointerEvents='none'
+          style={[styles.refreshIndicator, { top: insets.top + space[2] }]}
+        >
+          <ActivityIndicator
+            size={26}
+            color={colors.text.primary}
+          />
+        </View>
+      )}
     </Screen>
   )
 }
+
+const styles = StyleSheet.create({
+  refreshIndicator: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center'
+  }
+})

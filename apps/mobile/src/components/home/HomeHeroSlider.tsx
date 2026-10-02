@@ -17,7 +17,9 @@ import type { DiscoverItemResponse } from '@app/api'
 import { Button } from '../ui/Button'
 
 import { router } from 'expo-router'
+import { HERO_GRADIENT } from '../hero/HeroBackdrop'
 import { TitleInfo } from '../hero/TitleInfo'
+import { TITLE_CARD_CONFIG } from '../titles/title-card/TitleCard.config'
 import { HomeHeroSlide } from './HomeHeroSlide'
 import { PaginationDot } from './PaginationDot'
 
@@ -31,6 +33,11 @@ export function HomeHeroSlider({ items }: Props) {
 
   const height = width * 1.35
   const current = items[index]
+
+  const config = current?.type ? TITLE_CARD_CONFIG[current.type] : null
+  const accentColor = config ? config.accent : 'transparent'
+  const icon = current?.type ? config?.icon : Play
+  const buttonAction = config ? config.buttonAction : 'Play'
 
   const scrollX = useSharedValue(0)
 
@@ -67,13 +74,8 @@ export function HomeHeroSlider({ items }: Props) {
       </Animated.ScrollView>
 
       <LinearGradient
-        colors={[
-          'rgba(2,0,3,0.7)',
-          'transparent',
-          'rgba(2,0,3,0.9)',
-          colors.bg.base
-        ]}
-        locations={[0, 0.35, 0.75, 1]}
+        colors={HERO_GRADIENT.colors}
+        locations={HERO_GRADIENT.location}
         style={StyleSheet.absoluteFill}
         pointerEvents='none'
       />
@@ -98,10 +100,11 @@ export function HomeHeroSlider({ items }: Props) {
         <View style={styles.bottom}>
           <View style={styles.actions}>
             <Button
-              icon={Play}
+              icon={icon}
+              tintColor={accentColor}
               onPress={() => router.push(`/title/${current?.key}`)}
             >
-              Watch Movie
+              {buttonAction}
             </Button>
 
             <Button

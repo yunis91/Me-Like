@@ -1,22 +1,62 @@
 import { HeroBackdrop } from '@/components/hero/HeroBackdrop'
 import { TitleInfo } from '@/components/hero/TitleInfo'
 import { SectionCarousel } from '@/components/section-carousel/SectionCarousel'
-import { TitleCard } from '@/components/title-card/TitleCard'
+import { CastCard } from '@/components/titles/CastCard'
+import { TitleCard } from '@/components/titles/TitleCard'
+import { TitleDetailSkeleton } from '@/components/titles/TitleDetailSkeleton'
+import { TITLE_CARD_CONFIG } from '@/components/titles/title-card/TitleCard.config'
+import { ActionButton } from '@/components/ui/ActionButton'
 import { Button } from '@/components/ui/Button'
 import { FloatingButton } from '@/components/ui/FloatingButton'
 import { Screen } from '@/components/ui/Screen'
 import { useDiscoverFindByKey } from '@app/api'
+import { CREATOR_ROLE_LABEL } from '@app/constants'
 import { colors, fontSize, fontWeight, space } from '@app/tokens'
+import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ChevronLeft, Plus } from 'lucide-react-native'
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
+import { Bookmark, ChevronLeft, Plus, Share, Star, ThumbsDown, ThumbsUp } from 'lucide-react-native'
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
+import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
+
+
+const OVERLAP = space[20]
 
 export default function TitleDetail() {
   const { key } = useLocalSearchParams<{ key: string}>()
   const { width } = useWindowDimensions()
-  const { data, isPanding } = useDiscoverFindByKey(key)
+  const { data, isPending } = useDiscoverFindByKey(key)
 
-  if (isPanding || !data || data.status !== 200) return <Screen />
+  const heroHeight = width * 1.2
+  const scrollY = useSharedValue(0)
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollY.set(event.contentOffset.y)
+  })
+
+  const heroStyle = useAnimatedStyle(() => {
+    const y = scrollY.get()
+    return {
+      opacity: interpolate(y, [0, heroHeight], [1, 0.4], 'clamp'),
+      transform: [
+        {
+          translateY: interpolate(
+            y,
+            [-heroHeight, 0, heroHeight],
+            [heroHeight /2, 0, -heroHeight * 0.3],
+            'clamp'
+          )
+        },
+        { scale: interpolate(y, [-heroHeight, 0], [2,1], 'clamp') }
+      ]
+    }
+  })
+
+  if (isPending || !data || data.status !== 200) {
+    return (
+      <Screen edges={[]}>
+        <TitleDetailSkeleton />
+      </Screen>
+    )
+  }
 
   const title = data.data
 
@@ -26,54 +66,129 @@ export default function TitleDetail() {
 
   const meta = [year, ...title.genres.slice(0, 3)].filter(Boolean).join(' · ')
 
-  const cast = title.cast.slice(0, 3).map(actor => actor.name).join(', ')
+  const ageRating = title.ageRating
+
+  const accentColor = TITLE_CARD_CONFIG[title.type].accent
+
+  const creatorRoles = [...new Set(title.creators.map(creator => creator.role))]
+  const creatorLines = creatorRoles.map(role => ({
+    role,
+    names: title.creators
+      .filter(creator => creator.role === role)
+      .map(creator => creator.name)
+  }))
 
   return (
     <Screen edges={[]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <Animated.View 
+        style={[styles.hero, heroStyle]}
+        pointerEvents='none'
+      >
         <HeroBackdrop
           coverUrl={title.coverUrl}
-          height={width * 1.2}
+          height={heroHeight}
         />
+      </Animated.View>
 
-        <View style={styles.content}>
-          <TitleInfo
-            name={title.name}
-            meta={meta}
-            description={title.description}
-            descriptionLines={4}
+      <Animated.ScrollView
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+      >  
+        <View style={{height: heroHeight - OVERLAP}} />
+        <View style={styles.body}>
+          <LinearGradient
+            colors={['transparent', colors.bg.base]}
+            style={styles.bodyFade}
+            pointerEvents='none'
           />
+          <View style={styles.content}>
+            <TitleInfo
+              name={title.name}
+              meta={meta}
+              ageRating={ageRating}
+              description={title.description}
+              descriptionLines={4}
+            />
 
-          <Button 
-            icon={Plus}
-            size='lg'
-            onPress={() => {}}
-          >
-            Add to library
-          </Button>
+            <Button
+              icon={Plus}
+              size='lg'
+              tintColor={accentColor}
+              onPress={() => {}}
+            >
+              Add to library
+            </Button>
 
-          {!!cast && (
-            <Text style={styles.line}>
-              <Text style={styles.label}>Cast: </Text>
-              {cast}
-            </Text>
+            {creatorLines.map(({ role, names }) => (
+              <Text
+                key={role}
+                style={styles.line}
+              >
+                <Text style={styles.label}>{CREATOR_ROLE_LABEL[role]}: </Text>
+                {names.join(' · ')}
+              </Text>
+            ))}
+          </View>
+
+          <View>
+            <View style={styles.actions}>
+              <ActionButton
+                icon={Bookmark}
+                label='Watchlist'
+                onPress={() => {}}
+              />
+              <ActionButton
+                icon={Star}
+                label='Rate'
+                onPress={() => {}}
+              />
+              <ActionButton
+                icon={Share}
+                label='Share'
+                onPress={() => {}}
+              />
+              <ActionButton
+                icon={ThumbsUp}
+                label='Like'
+                onPress={() => {}}
+              />
+              <ActionButton
+                icon={ThumbsDown}
+                label='Dislike'
+                onPress={() => {}}
+              />
+            </View>
+          </View>
+
+          {!!title.cast.length && (
+            <View style={styles.cast}>
+              <SectionCarousel title='Top cast'>
+                {title.cast.map((person, index) => (
+                  <CastCard
+                    key={`${person.name}-${index}`}
+                    person={person}
+                  />
+                ))}
+              </SectionCarousel>
+            </View>
+          )}
+
+          {!!title.similar.length && (
+            <View style={styles.similar}>
+              <SectionCarousel title='You man also like'>
+                {title.similar.map(item => (
+                  <TitleCard
+                    key={item.key}
+                    title={item}
+                    onPress={() => router.push(`/title/${item.key}`)}
+                  />
+                ))}
+              </SectionCarousel>
+            </View>
           )}
         </View>
-
-        {!!title.similar.length && (
-          <View style={styles.similar}>
-            <SectionCarousel title='You man also like'>
-              {title.similar.map(item => (
-                <TitleCard
-                  key={item.key}
-                  title={item}
-                  onPress={() => router.push(`/title/${item.key}`)}
-                />
-              ))}
-            </SectionCarousel>
-          </View>
-        )}
-      </ScrollView>
+      </Animated.ScrollView>
 
       <FloatingButton 
         onPress={() => router.back()}
@@ -86,10 +201,27 @@ export default function TitleDetail() {
 }
 
 const styles = StyleSheet.create({
+  hero: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0
+  },
+  body: {
+    backgroundColor: colors.bg.base,
+    paddingBottom: space[6]
+  },
+  bodyFade: {
+    position: 'absolute',
+    top: -space[20] * 1.2,
+    left: 0,
+    right: 0,
+    height: space[20] * 1.2
+  },
   content: {
-    marginTop: -space[20],
     paddingHorizontal: space['layout-horizontal'],
-    gap: space[4]
+    gap: space[4],
+    marginTop: -space[10]
   },
   line: {
     color: colors.text['little-muted'],
@@ -99,7 +231,15 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontWeight: fontWeight.medium
   },
+  actions: {
+    flexDirection: 'row',
+    gap: space[4],
+    marginTop: space[6]
+  },
+  cast: {
+    marginTop: space[4]
+  },
   similar: {
-    marginTop: space[4],
+    marginTop: space[4]
   }
 })

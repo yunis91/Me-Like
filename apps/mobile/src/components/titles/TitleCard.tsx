@@ -1,6 +1,4 @@
-import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect'
 import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Pressable, StyleSheet, View } from 'react-native'
 import Animated, {
   useAnimatedStyle,
@@ -12,7 +10,9 @@ import { colors, radius, space } from '@app/tokens'
 
 import type { DiscoverItemResponse } from '@app/api'
 
-import { CARD_CONFIG } from './config'
+import { TITLE_CARD_CONFIG } from './title-card/TitleCard.config'
+import { TitleCardBadge } from './title-card/TitleCardBadge'
+import { TitleCardBookFX } from './title-card/TitleCardBookFX'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function TitleCard({ title, onPress }: Props) {
-  const config = CARD_CONFIG[title.type]
+  const config = TITLE_CARD_CONFIG[title.type]
 
   const scale = useSharedValue(1)
 
@@ -95,44 +95,12 @@ export function TitleCard({ title, onPress }: Props) {
           transition={200}
         />
 
-        {config.spine && (
-          <>
-            <LinearGradient
-              colors={[
-                'rgba(0,0,0,0.65)',
-                'rgba(255,255,255,0.12)',
-                'transparent'
-              ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.spine}
-            />
-            <View style={styles.pages} />
-          </>
-        )}
+        {config.spine && <TitleCardBookFX />}
 
-        <View style={styles.badge}>
-          {isGlassEffectAPIAvailable() ? (
-            <GlassView
-              style={styles.glass}
-              glassEffectStyle='clear'
-            >
-              <config.icon
-                size={13}
-                color={colors.text.primary}
-                strokeWidth={2.2}
-              />
-            </GlassView>
-          ) : (
-            <View style={[styles.glass, styles.fallback]}>
-              <config.icon
-                size={13}
-                color={colors.text.primary}
-                strokeWidth={2.2}
-              />
-            </View>
-          )}
-        </View>
+        <TitleCardBadge
+          accentColor={config.accent}
+          icon={config.icon}
+        />
       </AnimatedPressable>
     </View>
   )

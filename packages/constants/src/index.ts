@@ -21,3 +21,5 @@ export const ACCESS_TOKEN = 'accessToken'
 export const REFRESH_TOKEN = 'refreshToken'
 
 export * from './auth-form'
+export * from './creatorRole'
+

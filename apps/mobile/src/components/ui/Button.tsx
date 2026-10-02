@@ -3,7 +3,9 @@ import { Pressable, StyleSheet, Text } from 'react-native'
 
 import type { TButtonSize, TButtonVariant } from '@app/types'
 
+import { isGlassEffectAvailable } from '@/utils/is-glass-effect-available'
 import { colors, fontSize, fontWeight, radius, space } from '@app/tokens'
+import { GlassView } from 'expo-glass-effect'
 
 interface Props {
   children?: React.ReactNode
@@ -11,12 +13,18 @@ interface Props {
   size?: TButtonSize
   icon?: LucideIcon
   isDisabled?: boolean
+  tintColor?: string
   onPress: () => void
 }
 
 const CONTENT_COLOR: Record<TButtonVariant, string> = {
   primary: colors.text.secondary,
   secondary: colors.text.primary
+}
+
+const VARIANT_BACKGROUND: Record<TButtonVariant, string> = {
+  primary: colors.primary,
+  secondary: colors.bg.card
 }
 
 const ICON_SIZE: Record<TButtonSize, number> = {
@@ -30,10 +38,14 @@ export function Button({
   size = 'md',
   icon: Icon,
   isDisabled,
+  tintColor,
   onPress
 }: Props) {
   const isIconOnly = !children && !!Icon
-  const contentColor = CONTENT_COLOR[variant]
+  const hasGlassEffect = isGlassEffectAvailable()
+
+  const contentColor = tintColor ? colors.text.primary : CONTENT_COLOR[variant]
+  const background = tintColor ?? VARIANT_BACKGROUND[variant]
 
   return (
     <Pressable
@@ -41,13 +53,25 @@ export function Button({
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.root,
-        variantStyles[variant],
         sizeStyles[size],
         isIconOnly && [styles.iconOnly, iconOnlySizes[size]],
+        // GlassView не умеет сама сайзиться под текст переменной длины — её
+        // держим декоративным слоем-подложкой, а размер и ширину считает
+        // сам Pressable (как обычный flex-контент). Без glass — просто заливка.
+        !hasGlassEffect && { backgroundColor: background },
         pressed && styles.pressed,
         isDisabled && styles.disabled
       ]}
     >
+      {hasGlassEffect && (
+        <GlassView
+          style={StyleSheet.absoluteFill}
+          glassEffectStyle='clear'
+          isInteractive
+          tintColor={background}
+        />
+      )}
+
       {Icon && (
         <Icon
           size={ICON_SIZE[size]}
@@ -69,17 +93,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: space[2],
-    borderRadius: radius.full
+    borderRadius: radius.full,
+    overflow: 'hidden'
   },
   iconOnly: { paddingHorizontal: 0, aspectRatio: 1 },
   pressed: { opacity: 0.7 },
   disabled: { opacity: 0.4 },
   label: { fontWeight: fontWeight.semibold }
-})
-
-const variantStyles = StyleSheet.create({
-  primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: colors.bg.card }
 })
 
 const sizeStyles = StyleSheet.create({
