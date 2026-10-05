@@ -9,17 +9,16 @@ interface Props extends TextInputProps {
   isPassword?: boolean
 }
 
-export function Input({error, isPassword, value, ...props}: Props) {
+export function Input({error, isPassword, multiline, ...props}: Props) {
   const [isHidden, setIsHidden] = useState(isPassword)
 
   return (
     <View style={styles.root}>
-      <View style={[styles.field, !!error && styles.fieldError]}>
+      <View style={[styles.field, multiline && styles.fieldMultiline, !!error && styles.fieldError]}>
         <TextInput
-          style={ styles.input }
+          style={ [styles.input, multiline && styles.inputMultiline] }
           placeholderTextColor={colors.text.muted}
           secureTextEntry={isPassword && isHidden}
-          value={value ?? ''}
           {...props}
         />
 
@@ -59,6 +58,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     borderWidth: 1,
     backgroundColor: colors.secondary,
+  },
+  fieldMultiline: {
+    height: undefined,
+    minHeight: 110,
+    paddingVertical: space[4],
+    alignItems: 'flex-start',
+    paddingHorizontal: space[4],
+    borderRadius: radius.md,
+    borderColor: 'transparent',
+    backgroundColor: colors.bg.card,
+  },
+  inputMultiline: {
+    paddingTop: 0,
+    textAlignVertical: 'top'
   },
   fieldError: { borderColor: colors.status.error },
   input: {

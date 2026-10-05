@@ -146,7 +146,7 @@ export default function TitleDetail() {
               <ActionButton
                 icon={Share}
                 label='Share'
-                onPress={() => {}}
+                onPress={() => router.push(`/share/${title.key}`)}
               />
               <ActionButton
                 icon={ThumbsUp}
