@@ -34,13 +34,13 @@ export function SectionCarousel({ title, onPressArrow, children }: Props) {
 
 const styles = StyleSheet.create({
 	root: {
-		gap: space[3], marginBottom: space[6]
+		gap: space[3], marginBottom: space['layout-horizontal']
 	},
 	header: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginHorizontal: space[6],
+		marginHorizontal: space['layout-horizontal'],
 		marginBottom: space[2]
 	},
 	title: {
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
 	},
 	scrollContent: {
 		gap: space[3],
-		paddingHorizontal: space[6]
+		paddingHorizontal: space['layout-horizontal']
 	},
 });

@@ -1,20 +1,30 @@
 import { colors, fontSize, radius, space } from "@app/tokens"
+import { GlassView } from 'expo-glass-effect'
+import hexToRgba from 'hex-to-rgba'
 import { Eye, EyeOff } from "lucide-react-native"
 import { useState } from "react"
-import { Pressable, StyleSheet, Text, TextInput, type TextInputProps, View } from "react-native"
-
+import { Pressable, StyleSheet, Text, TextInput, View, type ColorValue, type TextInputProps } from "react-native"
 
 interface Props extends TextInputProps {
   error?: string
   isPassword?: boolean
+  tintColor?: ColorValue
 }
 
-export function Input({error, isPassword, multiline, ...props}: Props) {
+export function Input({error, isPassword, multiline, tintColor, ...props}: Props) {
   const [isHidden, setIsHidden] = useState(isPassword)
 
   return (
     <View style={styles.root}>
-      <View style={[styles.field, multiline && styles.fieldMultiline, !!error && styles.fieldError]}>
+      <GlassView
+        isInteractive
+        tintColor={error ? hexToRgba(colors.status.error, 0.15) : tintColor}
+        style={[
+          styles.field, 
+          multiline && styles.fieldMultiline, 
+          !!error && styles.fieldError
+        ]}
+      >
         <TextInput
           style={ [styles.input, multiline && styles.inputMultiline] }
           placeholderTextColor={colors.text.muted}
@@ -41,7 +51,7 @@ export function Input({error, isPassword, multiline, ...props}: Props) {
           </Pressable>
         )}
 
-      </View>
+      </GlassView>
 
       {!!error && <Text style={styles.error}>{error}</Text>}
     </View>

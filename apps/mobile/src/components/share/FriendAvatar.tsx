@@ -10,8 +10,7 @@ interface IFriendAvatarPops {
 	onPress: () => void
 }
 
-const AVATAR_SIZE = 64
-const BADGE_SIZE = 22
+const AVATAR_SIZE = 62
 
 export function FriendAvatar({
 	name,
@@ -33,7 +32,7 @@ export function FriendAvatar({
 				{isSelected && (
 					<View style={styles.badge}>
 						<Check 
-							size={22}
+							size={13}
 							color={colors.text.primary}
 							strokeWidth={3}
 						/>
@@ -67,10 +66,9 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		right: 0,
 		bottom: 0,
-		width: BADGE_SIZE,
-		height: BADGE_SIZE,
 		alignItems: 'center',
 		justifyContent: 'center',
+		padding: space[1],
 		borderRadius: radius.full,
 		borderWidth: 2,
 		borderColor: colors.bg.base,

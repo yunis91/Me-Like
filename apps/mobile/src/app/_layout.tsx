@@ -1,5 +1,4 @@
 import '@/lib/api'
-import { colors } from '@app/tokens'
 
 import {
   QueryClient,
@@ -26,17 +25,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <ThemeProvider value={DarkTheme}>
             <StatusBar style='auto' animated />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen 
-                name='share/[key]'
-                options={{
-                  presentation: 'formSheet',
-                  sheetAllowedDetents: 'fitToContents',
-                  sheetGrabberVisible: true,
-                  contentStyle: {backgroundColor: colors.bg.base}
-                }}
-              />
-            </Stack>
+            <Stack screenOptions={{ headerShown: false }} />
           </ThemeProvider>
         </SafeAreaProvider>
       </KeyboardProvider>

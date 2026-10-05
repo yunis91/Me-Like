@@ -1,6 +1,7 @@
 import { HeroBackdrop } from '@/components/hero/HeroBackdrop'
 import { TitleInfo } from '@/components/hero/TitleInfo'
 import { SectionCarousel } from '@/components/section-carousel/SectionCarousel'
+import { ShareBottomSheet } from '@/components/share/ShareBottomSheet'
 import { CastCard } from '@/components/titles/CastCard'
 import { TitleCard } from '@/components/titles/TitleCard'
 import { TitleDetailSkeleton } from '@/components/titles/TitleDetailSkeleton'
@@ -12,9 +13,11 @@ import { Screen } from '@/components/ui/Screen'
 import { useDiscoverFindByKey } from '@app/api'
 import { CREATOR_ROLE_LABEL } from '@app/constants'
 import { colors, fontSize, fontWeight, space } from '@app/tokens'
+import type { BottomSheetMethods } from '@expo/ui/community/bottom-sheet'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Bookmark, ChevronLeft, Plus, Share, Star, ThumbsDown, ThumbsUp } from 'lucide-react-native'
+import { useRef } from 'react'
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
@@ -25,6 +28,7 @@ export default function TitleDetail() {
   const { key } = useLocalSearchParams<{ key: string}>()
   const { width } = useWindowDimensions()
   const { data, isPending } = useDiscoverFindByKey(key)
+  const shareSheetRef = useRef<BottomSheetMethods>(null)
 
   const heroHeight = width * 1.2
   const scrollY = useSharedValue(0)
@@ -146,7 +150,7 @@ export default function TitleDetail() {
               <ActionButton
                 icon={Share}
                 label='Share'
-                onPress={() => router.push(`/share/${title.key}`)}
+                onPress={() => shareSheetRef.current?.present()}
               />
               <ActionButton
                 icon={ThumbsUp}
@@ -190,11 +194,16 @@ export default function TitleDetail() {
         </View>
       </Animated.ScrollView>
 
-      <FloatingButton 
+      <FloatingButton
         onPress={() => router.back()}
         icon={ChevronLeft}
         side="left"
         iconOffset={-2}
+      />
+
+      <ShareBottomSheet
+        ref={shareSheetRef}
+        title={title}
       />
     </Screen>
   )
