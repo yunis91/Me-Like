@@ -1,6 +1,6 @@
 import type { DiscoverDetailsResponse } from '@app/api'
 import { colors, fontSize, space } from '@app/tokens'
-import BottomSheet, { BottomSheetView } from '@expo/ui/community/bottom-sheet'
+import { BottomSheet, BottomSheetView } from '@expo/ui/community/bottom-sheet'
 import { type RefObject, useCallback, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
