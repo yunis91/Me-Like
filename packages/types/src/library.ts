@@ -1,0 +1,15 @@
+import type { LibraryEntryResponseStatus } from '@app/api'
+
+export type TLibraryStatus = LibraryEntryResponseStatus
+
+export type TActiveLibraryStatus = Exclude<TLibraryStatus, 'COMPLETED'>
+
+export type TNextLibraryStatus = Exclude<
+	TLibraryStatus,
+ 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED'
+>
+
+export type TLibraryStatusAction = {
+	label: string
+	nextStatus: TNextLibraryStatus
+}
