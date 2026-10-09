@@ -100,12 +100,11 @@ export function HomeHeroSlider({ items }: Props) {
         <View style={styles.bottom}>
           <View style={styles.actions}>
             <Button
+              label={buttonAction}
               icon={icon}
               tintColor={accentColor}
               onPress={() => router.push(`/title/${current?.key}`)}
-            >
-              {buttonAction}
-            </Button>
+            />
 
             <Button
               variant='secondary'

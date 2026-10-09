@@ -24,6 +24,9 @@ export class ApiError extends Error {
   }
 }
 
+export const getApiErrorMessages = (error: unknown) => 
+  error instanceof ApiError ? error.message : null
+
 let refreshPromise: Promise<boolean> | null = null
 
 const request = async(url: string, init?: RequestInit) => {

@@ -1,0 +1,49 @@
+import {
+  getDiscoverFindMyStateQueryKey,
+  useDiscoverFindMyState,
+  useLibrarySetStatusByDiscoverKey
+} from '@app/api'
+import type { TLibraryStatus } from '@app/types'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCheckAuthenticated } from './useCheckAuthenticated'
+
+
+export function useLibraryStatus(key: string) {
+  const queryClient = useQueryClient()
+
+  const { isAuthenticated } = useCheckAuthenticated()
+
+  const { data: myState } = useDiscoverFindMyState(key, {
+    query: {
+      enabled: isAuthenticated
+    }
+  })
+
+  const { mutate, variables, isPending } = useLibrarySetStatusByDiscoverKey({
+    mutation: {
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: getDiscoverFindMyStateQueryKey(key)
+        })
+    }
+  })
+
+  const pendingStatus = isPending ? variables?.data.status : undefined
+  const savedStatus = myState?.data.libraryEntry?.status ?? null
+
+  const setStatus = (status: TLibraryStatus) => {
+    mutate({
+      key,
+      data: {
+        status
+      }
+    })
+  }
+
+  return {
+    isAuthenticated,
+    status: pendingStatus ?? savedStatus,
+    rating: myState?.data.review?.rating ?? null,
+    setStatus
+  }
+}

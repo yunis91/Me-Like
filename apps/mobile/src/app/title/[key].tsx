@@ -1,23 +1,23 @@
+import { SectionCarousel } from '@/components/carousel'
+import { DetailsActions } from '@/components/detail/details-action-buttons/DetailsActions'
+import { ReviewsSection } from '@/components/detail/reviews-section'
+import { ShareButton } from '@/components/detail/share/ShareButton'
 import { HeroBackdrop } from '@/components/hero/HeroBackdrop'
 import { TitleInfo } from '@/components/hero/TitleInfo'
-import { SectionCarousel } from '@/components/section-carousel/SectionCarousel'
-import { ShareBottomSheet } from '@/components/share/ShareBottomSheet'
 import { CastCard } from '@/components/titles/CastCard'
 import { TitleCard } from '@/components/titles/TitleCard'
 import { TitleDetailSkeleton } from '@/components/titles/TitleDetailSkeleton'
 import { TITLE_CARD_CONFIG } from '@/components/titles/title-card/TitleCard.config'
-import { ActionButton } from '@/components/ui/ActionButton'
-import { Button } from '@/components/ui/Button'
-import { FloatingButton } from '@/components/ui/FloatingButton'
+import { Toolbar } from '@/components/toolbar'
+import { Button } from '@/components/ui'
 import { Screen } from '@/components/ui/Screen'
 import { useDiscoverFindByKey } from '@app/api'
 import { CREATOR_ROLE_LABEL } from '@app/constants'
+import { useCheckAuthenticated } from '@app/hooks'
 import { colors, fontSize, fontWeight, space } from '@app/tokens'
-import type { BottomSheetMethods } from '@expo/ui/community/bottom-sheet'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Bookmark, ChevronLeft, Plus, Share, Star, ThumbsDown, ThumbsUp } from 'lucide-react-native'
-import { useRef } from 'react'
+import { Home } from 'lucide-react-native'
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
@@ -28,8 +28,7 @@ export default function TitleDetail() {
   const { key } = useLocalSearchParams<{ key: string}>()
   const { width } = useWindowDimensions()
   const { data, isPending } = useDiscoverFindByKey(key)
-  const shareSheetRef = useRef<BottomSheetMethods>(null)
-
+  const { isAuthenticated } = useCheckAuthenticated()
   const heroHeight = width * 1.2
   const scrollY = useSharedValue(0)
   const scrollHandler = useAnimatedScrollHandler(event => {
@@ -84,6 +83,16 @@ export default function TitleDetail() {
 
   return (
     <Screen edges={[]}>
+      <Toolbar
+        isBackButton
+        isAbsolute
+        rightSide={
+          <ShareButton
+            isAuthenticated={isAuthenticated}
+            title={title}
+          />
+        }
+      />
       <Animated.View 
         style={[styles.hero, heroStyle]}
         pointerEvents='none'
@@ -115,15 +124,6 @@ export default function TitleDetail() {
               descriptionLines={4}
             />
 
-            <Button
-              icon={Plus}
-              size='lg'
-              tintColor={accentColor}
-              onPress={() => {}}
-            >
-              Add to library
-            </Button>
-
             {creatorLines.map(({ role, names }) => (
               <Text
                 key={role}
@@ -135,35 +135,11 @@ export default function TitleDetail() {
             ))}
           </View>
 
-          <View>
-            <View style={styles.actions}>
-              <ActionButton
-                icon={Bookmark}
-                label='Watchlist'
-                onPress={() => {}}
-              />
-              <ActionButton
-                icon={Star}
-                label='Rate'
-                onPress={() => {}}
-              />
-              <ActionButton
-                icon={Share}
-                label='Share'
-                onPress={() => shareSheetRef.current?.present()}
-              />
-              <ActionButton
-                icon={ThumbsUp}
-                label='Like'
-                onPress={() => {}}
-              />
-              <ActionButton
-                icon={ThumbsDown}
-                label='Dislike'
-                onPress={() => {}}
-              />
-            </View>
-          </View>
+          <DetailsActions
+            title={title}
+            accentColor={accentColor}
+            isAuthenticated={isAuthenticated}
+          />
 
           {!!title.cast.length && (
             <View style={styles.cast}>
@@ -191,19 +167,22 @@ export default function TitleDetail() {
               </SectionCarousel>
             </View>
           )}
+
+          <ReviewsSection titleKey={key} />
         </View>
       </Animated.ScrollView>
 
-      <FloatingButton
-        onPress={() => router.back()}
-        icon={ChevronLeft}
-        side="left"
-        iconOffset={-2}
-      />
-
-      <ShareBottomSheet
-        ref={shareSheetRef}
-        title={title}
+      <Toolbar
+        isAbsolute
+        position='bottom'
+        leftSide={
+          <Button
+            icon={Home}
+            size='lg'
+            variant='transparent'
+            onPress={() => router.push('/')}
+          />
+        }
       />
     </Screen>
   )
@@ -230,7 +209,8 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: space['layout-horizontal'],
     gap: space[4],
-    marginTop: -space[10]
+    marginTop: -space[10],
+    marginBottom: space[4]
   },
   line: {
     color: colors.text['little-muted'],

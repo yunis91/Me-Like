@@ -1,6 +1,6 @@
+import { SectionCarousel } from '@/components/carousel'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeHeroSlider } from '@/components/home/HomeHeroSlider'
-import { SectionCarousel } from '@/components/section-carousel/SectionCarousel'
 import { TitleCard } from '@/components/titles/TitleCard'
 import { Screen } from '@/components/ui/Screen'
 import { useDiscoverGetTrending } from '@app/api'

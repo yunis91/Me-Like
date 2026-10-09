@@ -5,9 +5,11 @@
   "dependencies": {
     "@app/api": "workspace:^",
     "@app/constants": "workspace:^",
+    "@app/hooks": "workspace:^",
     "@app/schemas": "workspace:^",
     "@app/tokens": "workspace:^",
     "@app/types": "workspace:^",
+    "@app/utils": "workspace:^",
     "@expo/ui": "~57.0.21",
     "@hookform/resolvers": "^5.9.1",
     "@tanstack/react-query": "^5.102.8",

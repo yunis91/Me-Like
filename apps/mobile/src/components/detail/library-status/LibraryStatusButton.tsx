@@ -1,53 +1,61 @@
-import { Button } from '@/components/ui'
-import { useLibraryStatus } from '@/hooks/useLibraryStatus'
-import { ADD_TO_LIBRARY_ACTION, LIBRARY_STATUS_ACTIONS, REVIEW_RATING } from '@app/constants'
+import { ADD_TO_LIBRARY_ACTION, LIBRARY_STATUS_ACTIONS } from '@app/constants'
+import { useLibraryStatus } from '@app/hooks'
 import { router } from 'expo-router'
-import { Star } from 'lucide-react-native'
+import { useEffect } from 'react'
+import { type ColorValue } from 'react-native'
+
+import { Button } from '@/components/ui'
+
 import { LIBRARY_ACTION_ICONS } from './library-status.data'
 
-
-interface Props {
-	titleKey: string
+interface LibraryStatusButtonProps {
+  titleKey: string
+  tintColor?: ColorValue
+  openSheet?: () => void
 }
 
-export function LibraryStatusButton({ titleKey }: Props) {
-	const { isAuthorized, status, rating, setStatus } = useLibraryStatus(titleKey)
+export function LibraryStatusButton({
+  titleKey,
+  tintColor,
+  openSheet
+}: LibraryStatusButtonProps) {
+  // TODO: add a rating button
+  const { isAuthenticated, status, rating, setStatus } =
+    useLibraryStatus(titleKey)
 
-	const openReview = () => router.push(`/review/${titleKey}`)
+  // Побочный эффект (открытие чужой BottomSheet) нельзя дёргать прямо в
+  // теле компонента во время рендера — React ругается "Cannot update a
+  // component while rendering a different component". Переносим в useEffect
+  useEffect(() => {
+    if (status === 'COMPLETED') openSheet?.()
+  }, [status, openSheet])
 
-	if (status === 'COMPLETED') {
-		return (
-			<Button
-				variant="secondary"
-				size="lg"
-				icon={Star}
-				onPress={openReview}
-			>
-				{rating ? `Rated ${rating}/${REVIEW_RATING.max}` : 'Rate'}
-			</Button>
-		)
-	}
+  const action =
+    status && status !== 'COMPLETED'
+      ? LIBRARY_STATUS_ACTIONS[status]
+      : ADD_TO_LIBRARY_ACTION
 
-	const action = status ? LIBRARY_STATUS_ACTIONS[status] : ADD_TO_LIBRARY_ACTION
+  const onPress = () => {
+    if (!isAuthenticated) {
+      router.push('/login')
 
-	const onPress = () => {
-		if (!isAuthorized) {
-			router.push('/login')
-			return
-		}
+      return
+    }
 
-		setStatus(action.nextStatus)
+    setStatus(action.nextStatus)
 
-		if (action.nextStatus === 'COMPLETED') openReview()
-	}
+    if (action.nextStatus === 'COMPLETED') {
+      openSheet?.()
+    }
+  }
 
-	return (
-		<Button
-			size="lg"
-			icon={LIBRARY_ACTION_ICONS[action.nextStatus]}
-			onPress={onPress}
-		>
-			{action.label}
-		</Button>
-	)
+  return (
+    <Button
+      label={action.label}
+      icon={LIBRARY_ACTION_ICONS[action.nextStatus]}
+      size='lg'
+      tintColor={tintColor}
+      onPress={onPress}
+    />
+  )
 }

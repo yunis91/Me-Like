@@ -4,7 +4,7 @@ export type TLibraryStatus = LibraryEntryResponseStatus
 
 export type TActiveLibraryStatus = Exclude<TLibraryStatus, 'COMPLETED'>
 
-export type TNextLibraryStatus = Exclude<
+export type TNextLibraryStatus = Extract<
 	TLibraryStatus,
  'PLANNED' | 'IN_PROGRESS' | 'COMPLETED'
 >

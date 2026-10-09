@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button"
-import { FloatingButton } from "@/components/ui/FloatingButton"
 import { Input } from "@/components/ui/Input"
 import { Screen } from "@/components/ui/Screen"
 import { ApiError } from "@app/api"
@@ -7,11 +6,11 @@ import { AUTH_CONTENT } from '@app/constants'
 import { authSchema, type TAuthForm } from '@app/schemas'
 import { colors, fontSize, fontWeight, space } from "@app/tokens"
 import { zodResolver } from '@hookform/resolvers/zod'
-import { router } from "expo-router"
-import { ChevronLeft } from "lucide-react-native"
+import { router, useLocalSearchParams, type Href } from "expo-router"
 import { Controller, useForm } from 'react-hook-form'
 import { Pressable, StyleSheet, Text, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
+import { Toolbar } from '../toolbar'
 
 interface Props {
 	type: keyof typeof AUTH_CONTENT
@@ -28,8 +27,16 @@ export function AuthForm({error, isPending, onSubmit, type}: Props) {
 		resolver: zodResolver(authSchema)
 	})
 
+  const {redirect} = useLocalSearchParams<{
+    redirect?: Extract<Href, string>
+  }>()
+
 	return (
   <Screen>
+    <Toolbar
+      isBackButton
+      isAbsolute
+    />
     <View style={styles.root}>
       <KeyboardAwareScrollView
         style={styles.scroll}
@@ -72,23 +79,17 @@ export function AuthForm({error, isPending, onSubmit, type}: Props) {
         )}
 
         <Button
+          label={isPending ?  content.pending : content.submit}
           size='lg'
           onPress={handleSubmit(onSubmit)}
-          isDisabled={isPending}
-        >
-          {isPending ?  content.pending : content.submit}
-        </Button>
-
-
-
+          disabled={isPending}
+        />
         </View>
       </KeyboardAwareScrollView>
-      <FloatingButton
-          icon={ChevronLeft}
-          onPress={() => router.replace('/')}
-          side='left'
-      />
-      <Pressable onPress={() => router.replace(content.footerHref)}>
+      <Pressable onPress={() => router.replace({
+        pathname:content.footerHref,
+        params: {redirect}
+      })}>
         <Text style={styles.link}>
           {content.footerText}{' '}
           <Text style={styles.linkAccent}>{content.footerAction}</Text>

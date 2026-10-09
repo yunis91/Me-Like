@@ -1,32 +1,21 @@
-import type { ReactNode } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-
 import { colors, fontSize, fontWeight } from '@app/tokens'
+import { StyleSheet, Text, type TextProps } from 'react-native'
 
-interface Props {
-	children: string
-	action?: ReactNode
-	style?: object
-}
-
-export function ScreenTitle({ children, action, style }: Props) {
-	return (
-		<View style={[styles.root, style]}>
-			<Text style={styles.title}>{children}</Text>
-			{action}
-		</View>
-	)
+export function ScreenTitle({ children, style, ...rest }: TextProps) {
+  return (
+    <Text
+      style={[styles.title, style]}
+      {...rest}
+    >
+      {children}
+    </Text>
+  )
 }
 
 const styles = StyleSheet.create({
-	root: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between'
-	},
-	title: {
-		color: colors.text.primary,
-		fontSize: fontSize['1.5xl'],
-		fontWeight: fontWeight.bold,
-	},
+  title: {
+    color: colors.text.primary,
+    fontSize: fontSize['1.5xl'],
+    fontWeight: fontWeight.bold
+  }
 })
