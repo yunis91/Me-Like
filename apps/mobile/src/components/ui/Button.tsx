@@ -45,7 +45,9 @@ interface Props
 }
 
 const CONTENT_COLOR: Record<TButtonVariant, string> = {
-  primary: colors.text.secondary,
+  // Фон primary — colors.button.primary (фиолетовый), а не белый, поэтому
+  // текст/иконка светлые, как у secondary/transparent
+  primary: colors.text.primary,
   secondary: colors.text.primary,
   transparent: colors.text.primary
 }
@@ -85,7 +87,7 @@ export function Button({
     : fallbackContentColor
 
   const fallbackTintColor = {
-    primary: hasGlassEffect ? 'rgba(255, 255, 255, 0.24)' : colors.primary,
+    primary: colors.button.primary,
     secondary: hasGlassEffect ? 'rgba(255, 255, 255, 0.08)' : colors.bg.card
   }
   const buttonTintColor: Record<TButtonVariant, ColorValue> = {

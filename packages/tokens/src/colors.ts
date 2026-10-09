@@ -18,5 +18,8 @@ export const colors = {
     success: '#8141F8',
     warning: '#F6A290',
     error: '#FF3F15'
+  },
+  button: {
+    primary: '#8141F8'
   }
 } as const
