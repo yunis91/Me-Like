@@ -22,10 +22,7 @@ export function LibraryStatusButton({
   // TODO: add a rating button
   const { isAuthenticated, status, rating, setStatus } =
     useLibraryStatus(titleKey)
-
-  // Побочный эффект (открытие чужой BottomSheet) нельзя дёргать прямо в
-  // теле компонента во время рендера — React ругается "Cannot update a
-  // component while rendering a different component". Переносим в useEffect
+    
   useEffect(() => {
     if (status === 'COMPLETED') openSheet?.()
   }, [status, openSheet])
