@@ -1,92 +1,90 @@
-import { PosterGrid } from '@/components/onboarding/PosterGrid'
-import { Button } from '@/components/ui'
-import { Screen } from '@/components/ui/Screen'
-import { useHasSeenOnboarding } from '@/hooks/useHasSeenOnboarding'
-import { useDiscoverGetTrending } from '@app/api'
-import { colors, fontSize, fontWeight, space } from '@app/tokens'
-import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-const POSTER_COUNT = 28
+import { colors, fontSize, fontWeight, space } from '@app/tokens'
+
+import { useDiscoverGetTrending } from '@app/api'
+
+import { Button } from '@/components/ui'
+
+import { PosterWall } from '@/components/onboarding/PosterWall'
+
+import { useOnboarding } from '@/providers/OnboardingProvider'
 
 export default function Onboarding() {
-  const { markAsSeen } = useHasSeenOnboarding()
-  const { data } = useDiscoverGetTrending({ take: POSTER_COUNT })
-  const items = data?.data ?? []
+  const { data } = useDiscoverGetTrending({ take: 24 })
+  const { completeOnboarding } = useOnboarding()
 
-  const onGetStarted = async () => {
-    await markAsSeen()
-    router.replace('/')
+  const coverUrls = (data?.data ?? []).flatMap(({ coverUrl }) =>
+    coverUrl ? [coverUrl] : []
+  )
+
+  const onGetStarted = async (route: 'login' | 'register') => {
+    await completeOnboarding()
+    router.push(`/${route}`)
   }
 
   return (
-    <Screen edges={[]}>
-      <View
-        style={styles.background}
-        pointerEvents='none'
+    <View style={styles.root}>
+      <PosterWall coverUrls={coverUrls} />
+
+      <SafeAreaView
+        edges={['bottom']}
+        style={styles.content}
       >
-        <View style={styles.posters}>
-          <PosterGrid items={items} />
-        </View>
+        <Text style={styles.logo}>Me Like</Text>
 
-
-        <LinearGradient
-          colors={['transparent', 'transparent', colors.bg.base]}
-          locations={[0, 0.45, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.playButtonWrapper}>
-          <Text style={styles.logo}>Me Like</Text>
-        </View>
-
-        <Text style={styles.title}>Start Watching Movies For Every Mood</Text>
-        <Text style={styles.subtitle}>
-          Watch Unlimited Movies, Music Video, TV shows, Gaming and More.
+        <Text style={styles.title}>Track Everything You Love</Text>
+        <Text style={styles.description}>
+          Movies, series, anime, books and games in one place. Rate what you
+          finish and discover your Taste DNA.
         </Text>
 
-        <Button
-          label='Get Started'
-          size='lg'
-          fullWidth
-          onPress={onGetStarted}
-        />
-      </View>
-    </Screen>
+        <View style={styles.actions}>
+          <Button
+            label='Get started'
+            size='lg'
+            onPress={() => onGetStarted('register')}
+          />
+          
+          <Button
+            label='Explore first'
+            size='lg'
+            variant='secondary'
+            onPress={completeOnboarding}
+          />
+        </View>
+
+        <Pressable
+          hitSlop={12}
+          onPress={() => onGetStarted('login')}
+        >
+          <Text style={styles.login}>
+            Already have an account?{' '}
+            <Text style={styles.loginAccent}>Log in</Text>
+          </Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '65%',
-    overflow: 'hidden',
-    paddingTop: space[10],
-  },
-  posters: {
-    opacity: 0.5,
-    marginTop: '-25%',
-    marginLeft: '-100%',
-    transform: [{rotate: '20deg'}]
+  root: {
+    flex: 1,
+    backgroundColor: colors.bg.base
   },
   content: {
     flex: 1,
     justifyContent: 'flex-end',
+    alignItems: 'stretch',
+    gap: space[4],
     paddingHorizontal: space['layout-horizontal'],
-    paddingBottom: space[10],
-    gap: space[3]
-  },
-  playButtonWrapper: {
-    alignItems: 'center',
-    marginBottom: space[4]
+    paddingBottom: space[4]
   },
   logo: {
+    textAlign: 'center',
     color: colors.text.primary,
     fontWeight: fontWeight.bold,
     fontSize: fontSize['3xl'],
@@ -94,15 +92,24 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text.primary,
-    fontSize: fontSize['2xl'],
+    fontSize: fontSize['3xl'],
     fontWeight: fontWeight.bold,
     textAlign: 'center'
   },
-  subtitle: {
+  description: {
     color: colors.text['little-muted'],
     fontSize: fontSize.sm,
     textAlign: 'center',
-    lineHeight: 20,
     marginBottom: space[4]
+  },
+  actions: { gap: space[3] },
+  login: {
+    color: colors.text.primary,
+    fontSize: fontSize.sm,
+    textAlign: 'center'
+  },
+  loginAccent: {
+    fontWeight: fontWeight.semibold,
+    textDecorationLine: 'underline'
   }
 })

@@ -1,10 +1,12 @@
+import { RootNavigator } from '@/components/navigation/RootNavigator'
 import '@/lib/api'
+import { OnboardingProvider } from '@/providers/OnboardingProvider'
 
 import {
   QueryClient,
   QueryClientProvider
 } from '@tanstack/react-query'
-import { DarkTheme, Stack, ThemeProvider } from "expo-router"
+import { DarkTheme, ThemeProvider } from "expo-router"
 import { StatusBar } from 'expo-status-bar'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -25,7 +27,9 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <ThemeProvider value={DarkTheme}>
             <StatusBar style='auto' animated />
-            <Stack screenOptions={{ headerShown: false }} />
+            <OnboardingProvider>
+              <RootNavigator/>
+            </OnboardingProvider>
           </ThemeProvider>
         </SafeAreaProvider>
       </KeyboardProvider>
