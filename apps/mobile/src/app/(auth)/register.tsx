@@ -22,7 +22,7 @@ export default function Register() {
           router.push(redirect)
           return
         }
-        router.replace('/profile')
+        router.replace('/')
       }
     }
   })

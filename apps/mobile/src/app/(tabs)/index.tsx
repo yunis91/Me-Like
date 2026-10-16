@@ -3,7 +3,7 @@ import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeHeroSlider } from '@/components/home/HomeHeroSlider'
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
 import { TitleCard } from '@/components/titles/TitleCard'
-import { Screen } from '@/components/ui/Screen'
+import { Screen } from '@/components/ui'
 import { useHasSeenOnboarding } from '@/hooks/useHasSeenOnboarding'
 import { useDiscoverGetTrending } from '@app/api'
 import { colors, space } from '@app/tokens'
@@ -33,10 +33,6 @@ export default function Index() {
   const topPicksForYouItems = items.slice(5, 12)
   const trandingItems = items.slice(12, 20)
 
-  // Онбординг — не гейт доступа (гостю и так открыто всё приложение), а
-  // просто приветственный экран на первый запуск, один раз за всё время
-  // установки. hasSeenOnboarding ещё не прочитан из SecureStore — ждём,
-  // иначе лишний раз мигнёт пустым
   if (hasSeenOnboarding === null) return null
 
   if (!hasSeenOnboarding) {
@@ -53,6 +49,9 @@ export default function Index() {
 
   return (
     <Screen edges={[]}>
+
+      <HomeHeader scrollY={scrollY} />
+
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: space[20] }}
@@ -97,7 +96,6 @@ export default function Index() {
         </SectionCarousel>
       </Animated.ScrollView>
 
-      <HomeHeader scrollY={scrollY} />
 
       {Platform.OS === 'ios' && isRefetching && (
         <View

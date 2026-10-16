@@ -1,16 +1,10 @@
 import { SectionCarousel } from '@/components/carousel'
-import { DetailsActions } from '@/components/detail/details-action-buttons/DetailsActions'
-import { ReviewsSection } from '@/components/detail/reviews-section'
-import { ShareButton } from '@/components/detail/share/ShareButton'
-import { HeroBackdrop } from '@/components/hero/HeroBackdrop'
-import { TitleInfo } from '@/components/hero/TitleInfo'
-import { CastCard } from '@/components/titles/CastCard'
-import { TitleCard } from '@/components/titles/TitleCard'
-import { TitleDetailSkeleton } from '@/components/titles/TitleDetailSkeleton'
-import { TITLE_CARD_CONFIG } from '@/components/titles/title-card/TitleCard.config'
+import { DetailsActions, ReviewsSection, ShareButton } from '@/components/detail'
+import { HeroBackdrop, TitleInfo } from '@/components/hero'
+import { CastCard, TITLE_CARD_CONFIG, TitleCard, TitleDetailSkeleton } from '@/components/titles'
 import { Toolbar } from '@/components/toolbar'
-import { Button } from '@/components/ui'
-import { Screen } from '@/components/ui/Screen'
+import { Button, Screen } from '@/components/ui'
+import { useHeroParallax } from '@/hooks'
 import { useDiscoverFindByKey } from '@app/api'
 import { CREATOR_ROLE_LABEL } from '@app/constants'
 import { useCheckAuthenticated } from '@app/hooks'
@@ -18,47 +12,17 @@ import { colors, fontSize, fontWeight, space } from '@app/tokens'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Home } from 'lucide-react-native'
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
-
-
-const OVERLAP = space[20]
+import { StyleSheet, Text, View } from 'react-native'
+import Animated from 'react-native-reanimated'
 
 export default function TitleDetail() {
   const { key } = useLocalSearchParams<{ key: string}>()
-  const { width } = useWindowDimensions()
   const { data, isPending } = useDiscoverFindByKey(key)
   const { isAuthenticated } = useCheckAuthenticated()
-  const heroHeight = width * 1.2
-  const scrollY = useSharedValue(0)
-  const scrollHandler = useAnimatedScrollHandler(event => {
-    scrollY.set(event.contentOffset.y)
-  })
-
-  const heroStyle = useAnimatedStyle(() => {
-    const y = scrollY.get()
-    return {
-      opacity: interpolate(y, [0, heroHeight], [1, 0.4], 'clamp'),
-      transform: [
-        {
-          translateY: interpolate(
-            y,
-            [-heroHeight, 0, heroHeight],
-            [heroHeight /2, 0, -heroHeight * 0.3],
-            'clamp'
-          )
-        },
-        { scale: interpolate(y, [-heroHeight, 0], [2,1], 'clamp') }
-      ]
-    }
-  })
+  const {heroHeight, heroStyle, scrollHandler} = useHeroParallax()
 
   if (isPending || !data || data.status !== 200) {
-    return (
-      <Screen edges={[]}>
-        <TitleDetailSkeleton />
-      </Screen>
-    )
+    return <Screen edges={[]}><TitleDetailSkeleton /></Screen>
   }
 
   const title = data.data
@@ -108,7 +72,7 @@ export default function TitleDetail() {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >  
-        <View style={{height: heroHeight - OVERLAP}} />
+        <View style={{height: heroHeight - space[20]}} />
         <View style={styles.body}>
           <LinearGradient
             colors={['transparent', colors.bg.base]}

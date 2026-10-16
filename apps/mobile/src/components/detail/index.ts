@@ -1,1 +1,5 @@
+export * from './details-action-buttons/DetailsActions'
 export * from './library-status'
+export * from './review-form'
+export * from './reviews-section'
+export * from './share'

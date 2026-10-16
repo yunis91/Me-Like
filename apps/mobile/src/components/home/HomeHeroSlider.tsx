@@ -14,7 +14,7 @@ import { colors, fontSize, fontWeight, space } from '@app/tokens'
 
 import type { DiscoverItemResponse } from '@app/api'
 
-import { Button } from '../ui/Button'
+import { Button } from '@/components/ui'
 
 import { router } from 'expo-router'
 import { HERO_GRADIENT } from '../hero/HeroBackdrop'

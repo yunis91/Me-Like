@@ -16,6 +16,7 @@ export const TYPE_LABELS: Record<TitleListItemResponseType, string> = {
   ANIME: 'Anime'
 }
 
+export const PROJECT_NAME = 'Me Like'
 
 export const ACCESS_TOKEN = 'accessToken'
 export const REFRESH_TOKEN = 'refreshToken'

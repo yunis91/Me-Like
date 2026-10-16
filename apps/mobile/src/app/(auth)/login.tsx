@@ -22,7 +22,7 @@ export default function Login () {
           return
         }
         
-        router.replace('/profile')
+        router.replace('/')
       }
     }
   })
